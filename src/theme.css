@@ -1692,7 +1692,8 @@ body,
 }
 
 /* Harmonização final dos acentos herdados do tema anterior. */
-.metric-card::before { background: var(--crm-gray-20); }
+.metric-card::before,
+.metric-card:nth-child(3)::before { background: var(--crm-gray-20); }
 .metric-card:nth-child(2)::before { background: rgba(255, 255, 255, 0.62); }
 
 .metric-icon.lilac,
