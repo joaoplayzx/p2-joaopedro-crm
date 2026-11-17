@@ -19,13 +19,13 @@ Aplicação web responsiva para pequenas empresas gerenciarem clientes, pedidos 
    npm install
    ```
 
-2. Configure a URL da API no arquivo `.env` (já preparado para desenvolvimento local):
+2. Crie o arquivo `.env` na raiz (ou copie `.env.example`) e configure a URL da API:
 
    ```env
    VITE_API_URL=http://localhost:3333
    ```
 
-3. Em outro terminal, inicie o servidor da professora:
+3. Coloque a pasta `servidor-crm` fornecida pela professora na raiz do workspace, ao lado do `package.json` do frontend. Em outro terminal, inicie o servidor:
 
    ```bash
    cd servidor-crm

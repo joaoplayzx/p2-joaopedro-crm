@@ -7,6 +7,27 @@ import type { Contact, ContactChannel, Customer, CustomerPayload, Order, OrderIt
 
 type Notice = { kind: 'error' | 'success'; text: string } | null;
 
+async function fetchAllCustomers(): Promise<{ customers: Customer[]; total: number }> {
+  const limit = 100;
+  let skip = 0;
+  let total = 0;
+  const customers: Customer[] = [];
+
+  do {
+    const response = await api<unknown>(`/clientes?limit=${limit}&skip=${skip}`);
+    const batch = extractList<Customer>(response, 'clientes');
+    const responseTotal = response && typeof response === 'object'
+      ? Number((response as Record<string, unknown>).total)
+      : NaN;
+    total = Number.isFinite(responseTotal) ? responseTotal : skip + batch.length;
+    customers.push(...batch);
+    if (batch.length === 0) break;
+    skip += batch.length;
+  } while (skip < total);
+
+  return { customers, total };
+}
+
 function errorMessage(error: unknown): string {
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error) return error.message;
@@ -26,7 +47,7 @@ function Protected({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   if (isLoading) return <Loading label="Verificando sua sessão…" />;
-  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
   return <>{children}</>;
 }
 
@@ -72,14 +93,14 @@ function Badge({ badge }: { badge: ReturnType<typeof customerBadge> }) {
 }
 
 function LoginPage() {
-  const { login, user } = useAuth();
+  const { login, user, sessionError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [username, setUsername] = useState('emilys');
   const [password, setPassword] = useState('emilyspass');
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice>(location.state?.expired ? { kind: 'error', text: 'Sua sessão expirou. Entre novamente.' } : null);
-  const from = (location.state as { from?: string } | null)?.from;
+  const from = (location.state as { from?: string | { pathname: string; search?: string; hash?: string } } | null)?.from;
   useEffect(() => { if (user) navigate(from || '/painel', { replace: true }); }, [from, navigate, user]);
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -89,7 +110,7 @@ function LoginPage() {
     catch (error) { setNotice({ kind: 'error', text: errorMessage(error) }); }
     finally { setLoading(false); }
   }
-  return <div className="login-page"><div className="login-decoration"><div className="login-orb orb-one" /><div className="login-orb orb-two" /><div className="login-quote"><span>“</span><h2>Relacionamentos fortes<br />fazem negócios melhores.</h2><p>Seu trabalho, organizado em um só lugar.</p></div><div className="login-decoration-foot">VÍNCULO · CRM</div></div><section className="login-panel"><div className="login-form-wrap"><Link to="/login" className="brand login-brand"><span className="brand-mark">v</span><span>vínculo<span className="brand-dot">.</span><small>CRM DE RELACIONAMENTO</small></span></Link><div className="login-heading"><div className="eyebrow">BEM-VINDO DE VOLTA</div><h1>Entre na sua conta</h1><p>Acesse seu espaço de trabalho com segurança.</p></div><ErrorNotice notice={notice} onClose={() => setNotice(null)} /><form onSubmit={submit} className="form-stack"><label>Usuário<input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Seu nome de usuário" /></label><label>Senha<input autoComplete="current-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" /></label><button className="button primary full" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}<span>→</span></button></form><div className="login-secure">⌑ Seus dados são protegidos por autenticação segura.</div></div></section></div>;
+  return <div className="login-page"><div className="login-decoration"><div className="login-orb orb-one" /><div className="login-orb orb-two" /><div className="login-quote"><span>“</span><h2>Relacionamentos fortes<br />fazem negócios melhores.</h2><p>Seu trabalho, organizado em um só lugar.</p></div><div className="login-decoration-foot">VÍNCULO · CRM</div></div><section className="login-panel"><div className="login-form-wrap"><Link to="/login" className="brand login-brand"><span className="brand-mark">v</span><span>vínculo<span className="brand-dot">.</span><small>CRM DE RELACIONAMENTO</small></span></Link><div className="login-heading"><div className="eyebrow">BEM-VINDO DE VOLTA</div><h1>Entre na sua conta</h1><p>Acesse seu espaço de trabalho com segurança.</p></div><ErrorNotice notice={notice ?? (sessionError ? { kind: 'error', text: sessionError } : null)} onClose={() => setNotice(null)} /><form onSubmit={submit} className="form-stack"><label>Usuário<input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Seu nome de usuário" /></label><label>Senha<input autoComplete="current-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" /></label><button className="button primary full" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}<span>→</span></button></form><div className="login-secure">⌑ Seus dados são protegidos por autenticação segura.</div></div></section></div>;
 }
 
 function DashboardPage() {
@@ -102,11 +123,10 @@ function DashboardPage() {
   const refresh = useCallback(async () => {
     setLoading(true); setNotice(null);
     try {
-      const [customerResult, orderResult] = await Promise.all([api<unknown>('/clientes?limit=100&skip=0'), api<unknown>('/pedidos')]);
-      setCustomers(extractList<Customer>(customerResult, 'clientes'));
+      const [customerResult, orderResult] = await Promise.all([fetchAllCustomers(), api<unknown>('/pedidos')]);
+      setCustomers(customerResult.customers);
       setOrders(extractList<Order>(orderResult, 'pedidos'));
-      const count = customerResult && typeof customerResult === 'object' ? Number((customerResult as Record<string, unknown>).total) : NaN;
-      setCustomerCount(Number.isFinite(count) ? count : extractList<Customer>(customerResult, 'clientes').length);
+      setCustomerCount(customerResult.total);
     } catch (error) { setNotice({ kind: 'error', text: errorMessage(error) }); }
     finally { setLoading(false); }
   }, []);
@@ -130,6 +150,7 @@ function DashboardPage() {
 function CustomersPage() {
   const navigate = useNavigate();
   const requestVersion = useRef(0);
+  const searchInput = useRef<HTMLInputElement>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [query, setQuery] = useState('');
@@ -137,6 +158,16 @@ function CustomersPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<Notice>(null);
+  useEffect(() => {
+    function focusSearch(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        searchInput.current?.focus();
+      }
+    }
+    window.addEventListener('keydown', focusSearch);
+    return () => window.removeEventListener('keydown', focusSearch);
+  }, []);
   const load = useCallback(async () => {
     const version = ++requestVersion.current;
     setLoading(true); setNotice(null);
@@ -155,7 +186,7 @@ function CustomersPage() {
   useEffect(() => { void load(); }, [load]);
   const pages = Math.max(1, Math.ceil(total / 5));
   return <div className="page-content"><PageHeader eyebrow="SUA CARTEIRA" title="Clientes" description="Todas as relações importantes, em um só lugar." action={<Link className="button primary" to="/clientes/novo"><span>＋</span> Novo cliente</Link>} />
-    <section className="panel table-panel"><div className="table-toolbar"><label className="search-box"><span>⌕</span><input aria-label="Buscar clientes" placeholder="Buscar por nome ou e-mail…" value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} /><kbd>⌘ K</kbd></label><span className="result-count">{total} {total === 1 ? 'cliente' : 'clientes'}</span></div><ErrorNotice notice={notice} />
+    <section className="panel table-panel"><div className="table-toolbar"><label className="search-box"><span>⌕</span><input ref={searchInput} aria-label="Buscar clientes" placeholder="Buscar por nome ou e-mail…" value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} /><kbd>⌘ K</kbd></label><span className="result-count">{total} {total === 1 ? 'cliente' : 'clientes'}</span></div><ErrorNotice notice={notice} />
       {loading ? <Loading /> : customers.length ? <><div className="table-wrap"><table><thead><tr><th>CLIENTE</th><th>EMPRESA / CIDADE</th><th>CONTATO</th><th>SELO</th><th /></tr></thead><tbody>{customers.map((customer) => <tr key={customer.id} onClick={() => navigate(`/clientes/${customer.id}`)} className="click-row"><td><div className="customer-cell"><div className="customer-avatar">{customer.nome?.slice(0, 1).toUpperCase() || '?'}</div><div><strong>{customer.nome}</strong><small>{customer.email}</small></div></div></td><td><span className="muted-cell">{customer.empresa || customer.cidade || '—'}</span></td><td><span className="muted-cell">{customer.telefone || '—'}</span></td><td><Badge badge={customerBadge(customer.id, orders)} /></td><td><Link to={`/clientes/${customer.id}`} className="row-arrow" aria-label={`Abrir ${customer.nome}`} onClick={(event) => event.stopPropagation()}>↗</Link></td></tr>)}</tbody></table></div><div className="pagination"><span>Mostrando {Math.min(total, page * 5 + 1)}–{Math.min(total, page * 5 + customers.length)} de {total}</span><div><button className="page-button" disabled={page === 0} onClick={() => setPage((current) => current - 1)}>←</button><span className="page-current">{page + 1} / {pages}</span><button className="page-button" disabled={page + 1 >= pages} onClick={() => setPage((current) => current + 1)}>→</button></div></div></> : <EmptyState title={query ? 'Nenhum resultado encontrado' : 'Sua carteira começa aqui'} text={query ? 'Tente buscar por outro nome ou e-mail.' : 'Cadastre seu primeiro cliente para começar a organizar seus relacionamentos.'} action={!query && <Link className="button secondary" to="/clientes/novo">＋ Cadastrar cliente</Link>} />}
     </section>
   </div>;
@@ -169,13 +200,25 @@ function CustomerFormPage() {
   const [loading, setLoading] = useState(editing);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
+  const [notFound, setNotFound] = useState(false);
   useEffect(() => {
     if (!id) return;
     let active = true;
-    api<unknown>(`/clientes/${id}`).then((payload) => {
-      const record = payload && typeof payload === 'object' && 'cliente' in payload ? (payload as { cliente: Customer }).cliente : payload as Customer;
-      if (active && record) setValues({ nome: record.nome ?? '', email: record.email ?? '', telefone: record.telefone ?? '', empresa: record.empresa ?? '', cidade: record.cidade ?? '' });
-    }).catch((error) => { if (active) setNotice({ kind: 'error', text: errorMessage(error) }); }).finally(() => { if (active) setLoading(false); });
+    async function loadCustomer() {
+      try {
+        const payload = await api<unknown>(`/clientes/${id}`);
+        const record = payload && typeof payload === 'object' && 'cliente' in payload ? (payload as { cliente: Customer }).cliente : payload as Customer;
+        if (active && record) setValues({ nome: record.nome ?? '', email: record.email ?? '', telefone: record.telefone ?? '', empresa: record.empresa ?? '', cidade: record.cidade ?? '' });
+      } catch (error) {
+        if (active) {
+          setNotFound(error instanceof ApiError && error.status === 404);
+          setNotice({ kind: 'error', text: errorMessage(error) });
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    void loadCustomer();
     return () => { active = false; };
   }, [id]);
   function update(key: keyof CustomerPayload, value: string) { setValues((current) => ({ ...current, [key]: value })); }
@@ -196,7 +239,7 @@ function CustomerFormPage() {
     } catch (error) { setNotice({ kind: 'error', text: errorMessage(error) }); }
     finally { setSaving(false); }
   }
-  return <div className="page-content narrow-page"><div className="breadcrumbs"><Link to="/clientes">Clientes</Link><span>/</span><span>{editing ? 'Editar cliente' : 'Novo cliente'}</span></div><PageHeader eyebrow={editing ? 'ATUALIZE OS DADOS' : 'AMPLIE SUA CARTEIRA'} title={editing ? 'Editar cliente' : 'Novo cliente'} description="Dados corretos ajudam você a cuidar melhor de cada relação." /><section className="panel form-panel">{loading ? <Loading /> : <><ErrorNotice notice={notice} /><form onSubmit={submit} className="form-stack"><div className="form-section-title"><span>01</span><div><strong>Informações principais</strong><small>Nome e e-mail são obrigatórios.</small></div></div><div className="field-grid"><label className="field-wide">Nome completo *<input value={values.nome} onChange={(e) => update('nome', e.target.value)} placeholder="Ex.: Marina Costa" /></label><label className="field-wide">E-mail *<input type="email" value={values.email} onChange={(e) => update('email', e.target.value)} placeholder="marina@empresa.com" /></label></div><div className="form-section-title second"><span>02</span><div><strong>Como encontrar</strong><small>Preencha pelo menos dois campos abaixo.</small></div></div><div className="field-grid"><label>Telefone<input value={values.telefone} onChange={(e) => update('telefone', e.target.value)} placeholder="(11) 99999-9999" /></label><label>Empresa<input value={values.empresa} onChange={(e) => update('empresa', e.target.value)} placeholder="Nome da empresa" /></label><label className="field-wide">Cidade<input value={values.cidade} onChange={(e) => update('cidade', e.target.value)} placeholder="Cidade" /></label></div><div className="form-actions"><Link className="button ghost" to={editing ? `/clientes/${id}` : '/clientes'}>Cancelar</Link><button className="button primary" disabled={saving}>{saving ? 'Salvando…' : editing ? 'Salvar alterações' : 'Cadastrar cliente'}<span>→</span></button></div></form></>}</section></div>;
+  return <div className="page-content narrow-page"><div className="breadcrumbs"><Link to="/clientes">Clientes</Link><span>/</span><span>{editing ? 'Editar cliente' : 'Novo cliente'}</span></div><PageHeader eyebrow={editing ? 'ATUALIZE OS DADOS' : 'AMPLIE SUA CARTEIRA'} title={editing ? 'Editar cliente' : 'Novo cliente'} description="Dados corretos ajudam você a cuidar melhor de cada relação." /><section className="panel form-panel">{loading ? <Loading /> : notFound ? <><ErrorNotice notice={notice} /><EmptyState title="Cliente não encontrado" text="Este cliente não existe ou foi removido." action={<Link className="button secondary" to="/clientes">Voltar para clientes</Link>} /></> : <><ErrorNotice notice={notice} /><form onSubmit={submit} className="form-stack"><div className="form-section-title"><span>01</span><div><strong>Informações principais</strong><small>Nome e e-mail são obrigatórios.</small></div></div><div className="field-grid"><label className="field-wide">Nome completo *<input value={values.nome} onChange={(e) => update('nome', e.target.value)} placeholder="Ex.: Marina Costa" /></label><label className="field-wide">E-mail *<input type="email" value={values.email} onChange={(e) => update('email', e.target.value)} placeholder="marina@empresa.com" /></label></div><div className="form-section-title second"><span>02</span><div><strong>Como encontrar</strong><small>Preencha pelo menos dois campos abaixo.</small></div></div><div className="field-grid"><label>Telefone<input value={values.telefone} onChange={(e) => update('telefone', e.target.value)} placeholder="(11) 99999-9999" /></label><label>Empresa<input value={values.empresa} onChange={(e) => update('empresa', e.target.value)} placeholder="Nome da empresa" /></label><label className="field-wide">Cidade<input value={values.cidade} onChange={(e) => update('cidade', e.target.value)} placeholder="Cidade" /></label></div><div className="form-actions"><Link className="button ghost" to={editing ? `/clientes/${id}` : '/clientes'}>Cancelar</Link><button className="button primary" disabled={saving}>{saving ? 'Salvando…' : editing ? 'Salvar alterações' : 'Cadastrar cliente'}<span>→</span></button></div></form></>}</section></div>;
 }
 
 function OrderEditor({ initial, saving, onSave, onCancel }: { initial?: OrderItem[]; saving: boolean; onSave: (items: OrderItem[]) => void; onCancel: () => void }) {
@@ -240,19 +283,27 @@ function CustomerDetailPage() {
   const [contactEditor, setContactEditor] = useState<{ contact?: Contact } | null>(null);
   const [busy, setBusy] = useState(false);
   const [channel, setChannel] = useState('todos');
+  const [notFound, setNotFound] = useState(false);
   const load = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
     setNotice(null);
+    setNotFound(false);
     try {
-      const [clientData, orderData, contactData] = await Promise.all([
+      const [clientResult, orderResult, contactResult] = await Promise.allSettled([
         api<unknown>(`/clientes/${id}`), api<unknown>(`/clientes/${id}/pedidos`), api<unknown>(`/clientes/${id}/atendimentos`),
       ]);
+      if (clientResult.status === 'rejected') throw clientResult.reason;
+      const clientData = clientResult.value;
       const record = clientData && typeof clientData === 'object' && 'cliente' in clientData ? (clientData as { cliente: Customer }).cliente : clientData as Customer;
-      setCustomer(record ?? null); setOrders(extractList<Order>(orderData, 'pedidos'));
-      const orderedContacts = extractList<Contact>(contactData, 'atendimentos').sort((a, b) => new Date(b.createdAt ?? b.created_at ?? b.data ?? 0).getTime() - new Date(a.createdAt ?? a.created_at ?? a.data ?? 0).getTime());
-      setContacts(orderedContacts);
+      setCustomer(record ?? null);
+      if (orderResult.status === 'fulfilled') setOrders(extractList<Order>(orderResult.value, 'pedidos'));
+      else setNotice({ kind: 'error', text: errorMessage(orderResult.reason) });
+      if (contactResult.status === 'fulfilled') {
+        const orderedContacts = extractList<Contact>(contactResult.value, 'atendimentos').sort((a, b) => new Date(b.createdAt ?? b.created_at ?? b.data ?? 0).getTime() - new Date(a.createdAt ?? a.created_at ?? a.data ?? 0).getTime());
+        setContacts(orderedContacts);
+      } else setNotice({ kind: 'error', text: errorMessage(contactResult.reason) });
     } catch (error) {
-      if (error instanceof ApiError && error.status === 404) setCustomer(null);
+      if (error instanceof ApiError && error.status === 404) { setCustomer(null); setNotFound(true); }
       else setNotice({ kind: 'error', text: errorMessage(error) });
     } finally { setLoading(false); }
   }, [id]);
@@ -306,7 +357,7 @@ function CustomerDetailPage() {
   }
   const filteredContacts = useMemo(() => channel === 'todos' ? contacts : contacts.filter((contact) => contact.canal === channel), [channel, contacts]);
   if (loading) return <div className="page-content"><Loading /></div>;
-  if (!customer) return <div className="page-content"><div className="breadcrumbs"><Link to="/clientes">Clientes</Link><span>/</span><span>Detalhe</span></div><EmptyState title="Cliente não encontrado" text="Este cliente não existe ou foi removido." action={<Link className="button secondary" to="/clientes">Voltar para clientes</Link>} /></div>;
+  if (!customer) return <div className="page-content"><div className="breadcrumbs"><Link to="/clientes">Clientes</Link><span>/</span><span>Detalhe</span></div>{notFound ? <EmptyState title="Cliente não encontrado" text="Este cliente não existe ou foi removido." action={<Link className="button secondary" to="/clientes">Voltar para clientes</Link>} /> : <><ErrorNotice notice={notice} /><EmptyState title="Não foi possível carregar o cliente" text="Verifique sua conexão e tente novamente." action={<button className="button secondary" onClick={() => void load()}>Tentar novamente</button>} /></>}</div>;
   return <div className="page-content"><div className="breadcrumbs"><Link to="/clientes">Clientes</Link><span>/</span><span>{customer.nome}</span></div><ErrorNotice notice={notice} />
     <section className="customer-hero panel"><div className="hero-avatar">{customer.nome?.slice(0, 1).toUpperCase()}</div><div className="hero-info"><div className="hero-name-line"><h1>{customer.nome}</h1><Badge badge={customerBadge(customer.id, orders)} /></div><p>{customer.empresa || 'Pessoa física'}{customer.cidade ? ` · ${customer.cidade}` : ''}</p><div className="hero-contact"><span>✉ {customer.email}</span>{customer.telefone && <span>⌕ {customer.telefone}</span>}</div></div><div className="hero-actions"><Link className="button secondary" to={`/clientes/${id}/editar`}>✎ <span>Editar</span></Link><button className="button danger-ghost" disabled={busy} onClick={() => void deleteCustomer()}>Excluir</button></div></section>
     <section className="detail-summary"><div><span>Compras válidas</span><strong>{formatCurrency(customerPurchaseTotal(customer.id, orders))}</strong></div><div><span>Pedidos</span><strong>{orders.length}</strong></div><div><span>Atendimentos</span><strong>{contacts.length}</strong></div></section>
@@ -328,10 +379,20 @@ function OrdersPage() {
   const [notice, setNotice] = useState<Notice>(null);
   useEffect(() => {
     let active = true;
-    Promise.all([api<unknown>('/pedidos'), api<unknown>('/clientes?limit=100&skip=0')])
-      .then(([ordersData, customersData]) => { if (active) { setOrders(extractList<Order>(ordersData, 'pedidos')); setCustomers(extractList<Customer>(customersData, 'clientes')); } })
-      .catch((error) => { if (active) setNotice({ kind: 'error', text: errorMessage(error) }); })
-      .finally(() => { if (active) setLoading(false); });
+    async function loadOrders() {
+      try {
+        const [ordersData, customersData] = await Promise.all([api<unknown>('/pedidos'), fetchAllCustomers()]);
+        if (active) {
+          setOrders(extractList<Order>(ordersData, 'pedidos'));
+          setCustomers(customersData.customers);
+        }
+      } catch (error) {
+        if (active) setNotice({ kind: 'error', text: errorMessage(error) });
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    void loadOrders();
     return () => { active = false; };
   }, []);
   const customerById = useMemo(() => new Map(customers.map((customer) => [String(customer.id), customer])), [customers]);

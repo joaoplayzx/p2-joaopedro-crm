@@ -1,11 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { api, jsonBody } from './api';
+import { api, ApiError, jsonBody } from './api';
 import type { User } from './types';
 
 interface AuthValue {
   user: User | null;
   isLoading: boolean;
+  sessionError: string | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -22,21 +23,24 @@ function normalizeUser(value: unknown): User {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionError, setSessionError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   const logout = useCallback(() => {
     localStorage.removeItem('crm_access_token');
     setUser(null);
-    navigate('/login', { replace: true, state: { from: location.pathname } });
-  }, [location.pathname, navigate]);
+    setSessionError(null);
+    navigate('/login', { replace: true, state: { from: location } });
+  }, [location, navigate]);
 
   useEffect(() => {
     const onUnauthorized = () => {
       localStorage.removeItem('crm_access_token');
       setUser(null);
+      setSessionError(null);
       setIsLoading(false);
-      navigate('/login', { replace: true, state: { from: location.pathname, expired: true } });
+      navigate('/login', { replace: true, state: { from: location, expired: true } });
     };
     window.addEventListener('crm:unauthorized', onUnauthorized);
     return () => window.removeEventListener('crm:unauthorized', onUnauthorized);
@@ -49,27 +53,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return () => { active = false; };
     }
-    api<unknown>('/auth/me')
-      .then((result) => { if (active) setUser(normalizeUser(result)); })
-      .catch(() => {
+    async function validateSession() {
+      try {
+        const result = await api<unknown>('/auth/me');
+        if (active) setUser(normalizeUser(result));
+      } catch (error: unknown) {
         if (active) {
-          localStorage.removeItem('crm_access_token');
           setUser(null);
+          if (error instanceof ApiError && error.status === 401) {
+            localStorage.removeItem('crm_access_token');
+          } else {
+            setSessionError(error instanceof Error ? error.message : 'Não foi possível verificar sua sessão.');
+          }
         }
-      })
-      .finally(() => { if (active) setIsLoading(false); });
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    }
+    void validateSession();
     return () => { active = false; };
   }, []);
 
   const login = useCallback(async (username: string, password: string) => {
+    setSessionError(null);
     const result = await api<{ accessToken: string }>('/auth/login', { method: 'POST', body: jsonBody({ username, password }) });
     if (!result?.accessToken) throw new Error('O servidor não retornou o token de acesso.');
     localStorage.setItem('crm_access_token', result.accessToken);
-    const profile = await api<unknown>('/auth/me');
-    setUser(normalizeUser(profile));
+    try {
+      const profile = await api<unknown>('/auth/me');
+      setUser(normalizeUser(profile));
+    } catch (error) {
+      localStorage.removeItem('crm_access_token');
+      setUser(null);
+      throw error;
+    }
   }, []);
 
-  const value = useMemo(() => ({ user, isLoading, login, logout }), [user, isLoading, login, logout]);
+  const value = useMemo(() => ({ user, isLoading, sessionError, login, logout }), [user, isLoading, sessionError, login, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
