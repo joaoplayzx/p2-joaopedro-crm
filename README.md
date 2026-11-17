@@ -61,7 +61,7 @@ npm run preview
 
 ## Referência visual
 
-A paleta azul e a separação de camadas claras foram adaptadas como referência do [IBM Carbon Design System](https://designsystems.surf/design-systems/ibm), listado na seção **Design Systems** do repositório [recursos-frontend](https://github.com/yurimutti/recursos-frontend). As cores são aplicadas por tokens de função no tema do CRM; nenhum asset do Carbon foi copiado.
+O visual foi adaptado do [Sage Design System, do Kajabi](https://designsystems.surf/design-systems/kajabi), listado no catálogo [recursos-frontend](https://github.com/yurimutti/recursos-frontend). O CRM usa a paleta azul e neutra, hierarquia tipográfica e camadas de cards como referência; não copia assets ou componentes proprietários.
 
 ## Entrega ZIP
 
