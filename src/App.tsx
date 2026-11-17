@@ -93,6 +93,22 @@ function Badge({ badge }: { badge: ReturnType<typeof customerBadge> }) {
   return <span className={`customer-badge ${badge === 'VIP' ? 'vip' : badge === 'Regular' ? 'regular' : 'none'}`}>{badge === 'VIP' && <span>✦ </span>}{badge}</span>;
 }
 
+function DashboardJourneyAnimation() {
+  return <div className="dashboard-journey" aria-hidden="true">
+    <span className="journey-track" />
+    <span className="journey-particle" />
+    <span className="journey-node journey-client">♧</span>
+    <span className="journey-node journey-order">▤</span>
+    <span className="journey-node journey-contact">•••</span>
+  </div>;
+}
+
+function SalesMetricAnimation() {
+  return <div className="sales-metric-animation" aria-hidden="true">
+    {[0, 1, 2, 3, 4, 5, 6].map((bar) => <span key={bar} style={{ animationDelay: `${bar * 110}ms` }} />)}
+  </div>;
+}
+
 function CrmFlowAnimation() {
   return <div className="crm-flow-art" aria-hidden="true">
     <span className="flow-connector connector-customer-order" />
@@ -151,11 +167,11 @@ function DashboardPage() {
   const firstName = String(user?.nome ?? user?.name ?? user?.username ?? 'por aqui').split(' ')[0];
   return <div className="page-content"><PageHeader eyebrow="VISÃO GERAL" title={`Olá, ${firstName}!`} description="Acompanhe de perto o que acontece com seus clientes." action={<Link className="button primary" to="/clientes/novo"><span>＋</span> Novo cliente</Link>} /><ErrorNotice notice={notice} />
     {loading ? <Loading /> : <>
-      <section className="metric-grid"><article className="metric-card"><div className="metric-top"><span>Total de clientes</span><span className="metric-icon lilac">♧</span></div><strong>{customerCount}</strong><small>em sua carteira</small></article><article className="metric-card"><div className="metric-top"><span>Total vendido</span><span className="metric-icon mint">↗</span></div><strong>{formatCurrency(paidOpenTotal)}</strong><small>sem pedidos cancelados</small></article><article className="metric-card"><div className="metric-top"><span>Ticket médio</span><span className="metric-icon peach">⌁</span></div><strong>{formatCurrency(average)}</strong><small>por pedido válido</small></article></section>
+      <section className="metric-grid"><article className="metric-card"><div className="metric-top"><span>Total de clientes</span><span className="metric-icon lilac">♧</span></div><strong>{customerCount}</strong><small>em sua carteira</small></article><article className="metric-card"><div className="metric-top"><span>Total vendido</span><span className="metric-icon mint">↗</span></div><strong>{formatCurrency(paidOpenTotal)}</strong><small>sem pedidos cancelados</small><SalesMetricAnimation /></article><article className="metric-card"><div className="metric-top"><span>Ticket médio</span><span className="metric-icon peach">⌁</span></div><strong>{formatCurrency(average)}</strong><small>por pedido válido</small></article></section>
       <div className="dashboard-grid"><section className="panel status-panel"><div className="section-heading"><div><h2>Pedidos por status</h2><p>Visão geral do seu fluxo de vendas</p></div><Link to="/pedidos" className="text-link">Ver pedidos <span>→</span></Link></div><div className="status-list">{summaries.map((item) => <div className="status-row" key={item.status}><div className="status-label"><span className={`status-dot ${item.status}`} /> <span>{item.status[0].toUpperCase() + item.status.slice(1)}</span></div><strong>{item.count}</strong><span className="status-value">{formatCurrency(item.total)}</span></div>)}</div></section>
         <section className="panel top-panel"><div className="section-heading"><div><h2>Clientes em destaque</h2><p>Top 3 por valor comprado</p></div><span className="trophy">✦</span></div>{best.length ? <div className="top-list">{best.map(({ customer, total }, index) => <Link className="top-customer" to={`/clientes/${customer.id}`} key={customer.id}><span className={`rank rank-${index + 1}`}>0{index + 1}</span><span className="top-avatar">{customer.nome?.slice(0, 1).toUpperCase() || '?'}</span><span className="top-customer-name"><strong>{customer.nome}</strong><small>{customer.empresa || customer.cidade || 'Cliente'}</small></span><strong className="top-amount">{formatCurrency(total)}</strong></Link>)}</div> : <div className="small-empty">Seus clientes com compras aparecerão aqui.</div>}</section>
       </div>
-      <section className="welcome-strip"><div className="welcome-spark">✦</div><div><strong>Um bom atendimento começa com contexto.</strong><p>Registre conversas e mantenha cada detalhe importante por perto.</p></div><Link to="/clientes" className="text-link">Explorar clientes <span>→</span></Link></section>
+      <section className="welcome-strip"><div className="welcome-spark">✦</div><div><strong>Um bom atendimento começa com contexto.</strong><p>Registre conversas e mantenha cada detalhe importante por perto.</p></div><DashboardJourneyAnimation /><Link to="/clientes" className="text-link">Explorar clientes <span>→</span></Link></section>
     </>}
   </div>;
 }

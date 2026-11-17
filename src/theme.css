@@ -926,6 +926,173 @@ tbody tr:nth-child(5) { animation-delay: 140ms; }
   }
 }
 
+/* Painel: visualização viva do percurso entre cadastro, pedido e conversa. */
+@keyframes journeyTravel {
+  0% { opacity: 0; transform: translateX(0) scale(0.7); }
+  14%, 82% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(70px) scale(1); }
+}
+
+@keyframes nodeBreathe {
+  0%, 100% { transform: translateY(0); box-shadow: 0 3px 8px rgba(37, 91, 126, 0.08); }
+  50% { transform: translateY(-3px); box-shadow: 0 7px 14px rgba(37, 91, 126, 0.16); }
+}
+
+@keyframes brandBreathe {
+  0%, 100% { box-shadow: 0 8px 18px rgba(42, 133, 190, 0.22); }
+  50% { box-shadow: 0 10px 24px rgba(75, 181, 225, 0.42); }
+}
+
+@keyframes salesBars {
+  0%, 100% { transform: scaleY(0.55); opacity: 0.62; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes salesShimmer {
+  0%, 65% { opacity: 0; transform: translateX(-140%) skewX(-18deg); }
+  78% { opacity: 0.34; }
+  100% { opacity: 0; transform: translateX(140%) skewX(-18deg); }
+}
+
+.dashboard-journey {
+  position: relative;
+  flex: 0 0 96px;
+  height: 42px;
+  overflow: hidden;
+}
+
+.journey-track {
+  position: absolute;
+  top: 20px;
+  right: 12px;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, #a9cfe3 0 4px, transparent 4px 8px);
+}
+
+.journey-node {
+  position: absolute;
+  top: 6px;
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  color: #387fa7;
+  font-size: 13px;
+  animation: nodeBreathe 2.8s ease-in-out infinite;
+}
+
+.journey-client {
+  left: 0;
+  background: #dff3fc;
+}
+
+.journey-order {
+  left: calc(50% - 14px);
+  background: #e3f6ed;
+  color: #328669;
+  animation-delay: 250ms;
+}
+
+.journey-contact {
+  right: 0;
+  background: #e9e9ff;
+  color: #6b63b9;
+  font-size: 9px;
+  letter-spacing: 1px;
+  animation-delay: 500ms;
+}
+
+.journey-particle {
+  position: absolute;
+  top: 18px;
+  left: 10px;
+  z-index: 1;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #43a6d2;
+  box-shadow: 0 0 0 4px rgba(67, 166, 210, 0.12), 0 0 12px rgba(67, 166, 210, 0.55);
+  animation: journeyTravel 2.8s ease-in-out infinite;
+}
+
+.sidebar .brand-mark {
+  animation: brandBreathe 5s ease-in-out infinite;
+}
+
+.metric-card:nth-child(2)::after {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  z-index: 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  content: '';
+  pointer-events: none;
+  animation: salesShimmer 7s ease-in-out 1.5s infinite;
+}
+
+.metric-card:nth-child(2) > * {
+  position: relative;
+  z-index: 1;
+}
+
+.metric-card:nth-child(2) > .sales-metric-animation {
+  position: absolute;
+  right: 16px;
+  bottom: 13px;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  width: 61px;
+  height: 28px;
+  padding: 2px 3px;
+  opacity: 0.78;
+}
+
+.sales-metric-animation span {
+  flex: 1;
+  min-width: 3px;
+  border-radius: 4px 4px 1px 1px;
+  background: linear-gradient(180deg, #e1f8ff, rgba(210, 242, 255, 0.45));
+  transform: scaleY(0.55);
+  transform-origin: bottom;
+  animation: salesBars 1.8s ease-in-out infinite;
+}
+
+.sales-metric-animation span:nth-child(1) { height: 36%; }
+.sales-metric-animation span:nth-child(2) { height: 58%; }
+.sales-metric-animation span:nth-child(3) { height: 46%; }
+.sales-metric-animation span:nth-child(4) { height: 78%; }
+.sales-metric-animation span:nth-child(5) { height: 62%; }
+.sales-metric-animation span:nth-child(6) { height: 92%; }
+.sales-metric-animation span:nth-child(7) { height: 100%; }
+
+@media (max-width: 760px) {
+  .dashboard-journey {
+    margin-left: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+  .dashboard-journey {
+    flex-basis: 88px;
+    margin-left: 0;
+  }
+
+  .metric-card:nth-child(2) > .sales-metric-animation {
+    right: 8px;
+    width: 42px;
+    gap: 2px;
+    opacity: 0.55;
+  }
+}
+
 @media (max-height: 620px) and (min-width: 761px) {
   .crm-flow-art {
     bottom: 35px;
