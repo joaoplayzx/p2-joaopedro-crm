@@ -437,3 +437,119 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Visual de produto: navegação escura e área de trabalho clara. */
+.sidebar {
+  background: linear-gradient(165deg, #1d1b3a 0%, #262248 100%);
+  border-right-color: #302d50;
+  box-shadow: 9px 0 32px rgba(27, 24, 58, 0.12);
+}
+
+.sidebar .brand {
+  color: #fff;
+}
+
+.sidebar .brand small {
+  color: #aaa6ca;
+}
+
+.sidebar .brand-dot {
+  color: #aaa0ff;
+}
+
+.nav-caption {
+  color: #9691bb;
+}
+
+.nav-link {
+  color: #c4c1d9;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.nav-link.active {
+  background: linear-gradient(105deg, rgba(132, 119, 234, 0.26), rgba(132, 119, 234, 0.1));
+  color: #fff;
+}
+
+.nav-link.active::before {
+  background: linear-gradient(180deg, #b6adff, #8375ec);
+}
+
+.nav-icon,
+.nav-link.active .nav-icon {
+  color: #b7b2d4;
+}
+
+.sidebar .user-card {
+  border-top-color: rgba(255, 255, 255, 0.11);
+}
+
+.sidebar .avatar {
+  background: #e7e3ff;
+  color: #5145b5;
+}
+
+.sidebar .user-meta strong {
+  color: #fff;
+}
+
+.sidebar .user-meta span,
+.sidebar .sidebar-foot {
+  color: #aaa6c5;
+}
+
+.sidebar .logout-icon {
+  color: #c3bfd8;
+}
+
+.sidebar .logout-icon:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+.main-area {
+  background: #f7f8fc;
+}
+
+.metric-card:nth-child(2) {
+  border-color: transparent;
+  background: linear-gradient(140deg, #6d61d2 0%, #5146b1 100%);
+  box-shadow: 0 14px 30px rgba(82, 70, 177, 0.2);
+}
+
+.metric-card:nth-child(2)::before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.metric-card:nth-child(2) .metric-top,
+.metric-card:nth-child(2) > strong,
+.metric-card:nth-child(2) > small {
+  color: #fff;
+}
+
+.metric-card:nth-child(2) .metric-top {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.metric-card:nth-child(2) > small {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.metric-card:nth-child(2) .metric-icon {
+  background: rgba(255, 255, 255, 0.17);
+  color: #fff;
+}
+
+.metric-card:nth-child(2):hover {
+  box-shadow: 0 19px 36px rgba(82, 70, 177, 0.26);
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    box-shadow: 14px 0 38px rgba(20, 17, 47, 0.24);
+  }
+}
