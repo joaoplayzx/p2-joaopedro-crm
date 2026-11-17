@@ -35,6 +35,11 @@ export const formatCurrency = (value: number): string => new Intl.NumberFormat('
 
 export const formatDate = (value?: string): string => {
   if (!value) return 'Data não informada';
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (dateOnly) {
+    const date = new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]));
+    return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(date);
+  }
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };

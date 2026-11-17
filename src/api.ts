@@ -19,6 +19,23 @@ function messageForStatus(status: number): string {
   return 'Não foi possível concluir a solicitação.';
 }
 
+function normalizeChannels(value: unknown, fromApi: boolean): unknown {
+  if (Array.isArray(value)) return value.map((item) => normalizeChannels(item, fromApi));
+  if (!value || typeof value !== 'object') return value;
+
+  const record = value as Record<string, unknown>;
+  const normalized = Object.fromEntries(
+    Object.entries(record).map(([key, item]) => [key, normalizeChannels(item, fromApi)]),
+  );
+  if (typeof normalized.canal === 'string') {
+    const channelMap = fromApi
+      ? { email: 'e-mail', whatsapp: 'WhatsApp' }
+      : { 'e-mail': 'email', WhatsApp: 'whatsapp' };
+    normalized.canal = channelMap[normalized.canal as keyof typeof channelMap] ?? normalized.canal;
+  }
+  return normalized;
+}
+
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!API_BASE) throw new ApiError(500, 'Configure VITE_API_URL no arquivo .env e reinicie o app.');
   const headers = new Headers(options.headers);
@@ -55,7 +72,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
         : messageForStatus(response.status);
     throw new ApiError(response.status, message);
   }
-  return payload as T;
+  return normalizeChannels(payload, true) as T;
 }
 
-export const jsonBody = (value: unknown) => JSON.stringify(value);
+export const jsonBody = (value: unknown) => JSON.stringify(normalizeChannels(value, false));

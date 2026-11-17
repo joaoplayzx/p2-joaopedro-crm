@@ -3,4 +3,5 @@ dist
 .env
 *.tsbuildinfo
 *.zip
+servidor-crm/
 .DS_Store
