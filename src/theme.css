@@ -553,3 +553,91 @@ a {
     box-shadow: 14px 0 38px rgba(20, 17, 47, 0.24);
   }
 }
+
+/* Variação azul clara solicitada: mantém contraste forte e suaviza os realces. */
+:root {
+  --purple: #438fc3;
+  --purple-dark: #3276aa;
+  --wash: #f3f8fc;
+}
+
+.main-area {
+  background: #f4f9fd;
+}
+
+.main-area::before {
+  background: radial-gradient(circle, rgba(89, 177, 225, 0.1), rgba(89, 177, 225, 0) 69%);
+}
+
+.sidebar {
+  background: linear-gradient(165deg, #17243b 0%, #1d3550 100%);
+  border-right-color: #263d58;
+}
+
+.sidebar .brand-dot {
+  color: #8ed8f7;
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, #62b9e8 0%, #3988c2 100%);
+  box-shadow: 0 8px 18px rgba(42, 133, 190, 0.28);
+}
+
+.nav-link.active {
+  background: linear-gradient(105deg, rgba(91, 177, 225, 0.27), rgba(91, 177, 225, 0.1));
+}
+
+.nav-link.active::before {
+  background: linear-gradient(180deg, #b8edff, #63b8e4);
+}
+
+.nav-link.active .nav-icon {
+  color: #b6e8fa;
+}
+
+.eyebrow,
+.text-link,
+.nav-link:hover {
+  color: #347eae;
+}
+
+.sidebar .nav-link:hover {
+  color: #fff;
+}
+
+.button.primary {
+  background: linear-gradient(135deg, #58afe0, #367fba);
+  box-shadow: 0 7px 16px rgba(52, 126, 181, 0.22);
+}
+
+.button.primary:hover {
+  background: linear-gradient(135deg, #439ed4, #2e70a8);
+  box-shadow: 0 10px 20px rgba(52, 126, 181, 0.28);
+}
+
+.metric-card:nth-child(2) {
+  background: linear-gradient(140deg, #58afe0 0%, #347bb9 100%);
+  box-shadow: 0 14px 30px rgba(52, 123, 185, 0.2);
+}
+
+.metric-card:nth-child(2):hover {
+  box-shadow: 0 19px 36px rgba(52, 123, 185, 0.26);
+}
+
+.welcome-strip {
+  border-color: #dcecf6;
+  background: linear-gradient(105deg, #eaf5fc 0%, #f2f8fc 62%, #eef7f7 100%);
+}
+
+:focus-visible {
+  outline-color: rgba(67, 151, 202, 0.4);
+}
+
+.login-decoration {
+  background: #1d3550;
+}
+
+.login-decoration::before {
+  background: radial-gradient(ellipse at 68% 23%, rgba(93, 177, 226, 0.42), transparent 44%),
+    radial-gradient(ellipse at 7% 84%, rgba(53, 166, 164, 0.28), transparent 40%);
+}
