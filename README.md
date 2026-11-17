@@ -59,6 +59,10 @@ npm run preview
 - Lista de pedidos com cliente, filtro por status e faixa de preço e ordenação por data ou valor.
 - Estados de carregamento, vazio e erro; layout adaptado para telas estreitas.
 
+## Referência visual
+
+A paleta azul e a separação de camadas claras foram adaptadas como referência do [IBM Carbon Design System](https://designsystems.surf/design-systems/ibm), listado na seção **Design Systems** do repositório [recursos-frontend](https://github.com/yurimutti/recursos-frontend). As cores são aplicadas por tokens de função no tema do CRM; nenhum asset do Carbon foi copiado.
+
 ## Entrega ZIP
 
 O arquivo ZIP deve conter o projeto e não deve incluir `node_modules` nem `dist`. O `.gitignore` já exclui essas pastas.
