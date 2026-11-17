@@ -109,18 +109,6 @@ function SalesMetricAnimation() {
   </div>;
 }
 
-function CrmFlowAnimation() {
-  return <div className="crm-flow-art" aria-hidden="true">
-    <span className="flow-connector connector-customer-order" />
-    <span className="flow-connector connector-order-contact" />
-    <span className="flow-spark spark-a">✦</span>
-    <span className="flow-spark spark-b">✧</span>
-    <div className="flow-card flow-customer"><span className="flow-avatar">MC</span><span className="flow-copy"><small>CLIENTE</small><strong>Marina Costa</strong></span><span className="flow-online" /></div>
-    <div className="flow-card flow-order"><span className="flow-icon">✓</span><span className="flow-copy"><small>PEDIDO</small><strong>Pagamento recebido</strong></span></div>
-    <div className="flow-card flow-contact"><span className="flow-message">•••</span><span className="flow-copy"><small>ATENDIMENTO</small><strong>Nova conversa</strong></span></div>
-  </div>;
-}
-
 function LoginPage() {
   const { login, user, sessionError } = useAuth();
   const navigate = useNavigate();
@@ -139,7 +127,7 @@ function LoginPage() {
     catch (error) { setNotice({ kind: 'error', text: errorMessage(error) }); }
     finally { setLoading(false); }
   }
-  return <div className="login-page"><div className="login-decoration"><div className="login-orb orb-one" /><div className="login-orb orb-two" /><CrmFlowAnimation /><div className="login-quote"><span>“</span><h2>Relacionamentos fortes<br />fazem negócios melhores.</h2><p>Seu trabalho, organizado em um só lugar.</p></div><div className="login-decoration-foot">VÍNCULO · CRM</div></div><section className="login-panel"><div className="login-form-wrap"><Link to="/login" className="brand login-brand"><span className="brand-mark">v</span><span>vínculo<span className="brand-dot">.</span><small>CRM DE RELACIONAMENTO</small></span></Link><div className="login-heading"><div className="eyebrow">BEM-VINDO DE VOLTA</div><h1>Entre na sua conta</h1><p>Acesse seu espaço de trabalho com segurança.</p></div><ErrorNotice notice={notice ?? (sessionError ? { kind: 'error', text: sessionError } : null)} onClose={() => setNotice(null)} /><form onSubmit={submit} className="form-stack"><label>Usuário<input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Seu nome de usuário" /></label><label>Senha<input autoComplete="current-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" /></label><button className="button primary full" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}<span>→</span></button></form><div className="login-secure">⌑ Seus dados são protegidos por autenticação segura.</div></div></section></div>;
+  return <div className="login-page"><div className="login-decoration"><div className="login-quote"><div className="login-eyebrow">VÍNCULO · CRM PARA PEQUENAS EMPRESAS</div><h2>Organize clientes e acompanhe cada venda.</h2><p>Clientes, pedidos e conversas em um só lugar, com o contexto que sua equipe precisa para atender melhor.</p><ul className="login-capabilities"><li><span>01</span> Carteira de clientes</li><li><span>02</span> Pedidos organizados</li><li><span>03</span> Histórico de atendimento</li></ul></div><div className="login-decoration-foot">GESTÃO DE RELACIONAMENTO</div></div><section className="login-panel"><div className="login-form-wrap"><Link to="/login" className="brand login-brand"><span className="brand-mark">v</span><span>vínculo<span className="brand-dot">.</span><small>CRM DE RELACIONAMENTO</small></span></Link><div className="login-heading"><div className="eyebrow">BEM-VINDO DE VOLTA</div><h1>Entre na sua conta</h1><p>Acesse seu espaço de trabalho com segurança.</p></div><ErrorNotice notice={notice ?? (sessionError ? { kind: 'error', text: sessionError } : null)} onClose={() => setNotice(null)} /><form onSubmit={submit} className="form-stack"><label>Usuário<input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Seu nome de usuário" /></label><label>Senha<input autoComplete="current-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" /></label><button className="button primary full" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}<span>→</span></button></form><div className="login-secure">⌑ Seus dados são protegidos por autenticação segura.</div></div></section></div>;
 }
 
 function DashboardPage() {
