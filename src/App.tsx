@@ -75,7 +75,7 @@ function LoginPage() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('emilys');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice>(location.state?.expired ? { kind: 'error', text: 'Sua sessão expirou. Entre novamente.' } : null);
