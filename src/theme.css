@@ -748,6 +748,192 @@ tbody tr:nth-child(5) { animation-delay: 140ms; }
   }
 }
 
+/* Pequena cena ilustrada: a jornada cliente → pedido → atendimento. */
+@keyframes flowBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes flowBobReverse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+@keyframes flowSparkle {
+  0%, 100% { opacity: 0.48; transform: scale(0.86) rotate(-8deg); }
+  50% { opacity: 1; transform: scale(1.12) rotate(8deg); }
+}
+
+@keyframes flowConnector {
+  0%, 100% { opacity: 0.36; }
+  50% { opacity: 0.9; }
+}
+
+.crm-flow-art {
+  position: absolute;
+  right: 23px;
+  bottom: 52px;
+  z-index: 1;
+  width: 265px;
+  height: 128px;
+  pointer-events: none;
+}
+
+.flow-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 43px;
+  padding: 6px 10px;
+  border: 1px solid rgba(220, 240, 250, 0.72);
+  border-radius: 12px;
+  background: rgba(245, 251, 255, 0.95);
+  box-shadow: 0 9px 24px rgba(8, 29, 55, 0.19);
+  color: #233d56;
+  backdrop-filter: blur(8px);
+}
+
+.flow-customer {
+  top: 0;
+  left: 5px;
+  width: 174px;
+  animation: flowBob 4.4s ease-in-out infinite;
+}
+
+.flow-order {
+  top: 41px;
+  right: 0;
+  width: 194px;
+  animation: flowBobReverse 5s 350ms ease-in-out infinite;
+}
+
+.flow-contact {
+  bottom: 0;
+  left: 28px;
+  width: 190px;
+  animation: flowBob 4.8s 700ms ease-in-out infinite;
+}
+
+.flow-avatar,
+.flow-icon,
+.flow-message {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  background: #dff3fc;
+  color: #287cae;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.flow-avatar {
+  border-radius: 50%;
+  background: linear-gradient(145deg, #c0eff8, #a9d8fa);
+  color: #245c81;
+}
+
+.flow-icon {
+  background: #e1f6ed;
+  color: #23876a;
+  font-size: 14px;
+}
+
+.flow-message {
+  background: #e9e9ff;
+  color: #6861ba;
+  letter-spacing: 1px;
+}
+
+.flow-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.flow-copy small {
+  color: #72889a;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.flow-copy strong {
+  overflow: hidden;
+  color: #29435b;
+  font-size: 9px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flow-online {
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #42bd8f;
+  box-shadow: 0 0 0 4px rgba(66, 189, 143, 0.12);
+}
+
+.flow-connector {
+  position: absolute;
+  z-index: -1;
+  height: 1px;
+  border-top: 1px dashed rgba(190, 233, 250, 0.82);
+  transform-origin: left center;
+  animation: flowConnector 3.2s ease-in-out infinite;
+}
+
+.connector-customer-order {
+  top: 32px;
+  left: 156px;
+  width: 70px;
+  transform: rotate(28deg);
+}
+
+.connector-order-contact {
+  top: 78px;
+  left: 72px;
+  width: 93px;
+  transform: rotate(152deg);
+  animation-delay: 600ms;
+}
+
+.flow-spark {
+  position: absolute;
+  color: #a9eaff;
+  font-size: 13px;
+  animation: flowSparkle 2.8s ease-in-out infinite;
+}
+
+.spark-a { top: 1px; right: 35px; }
+.spark-b { bottom: 6px; right: 16px; animation-delay: 900ms; }
+
+.login-decoration-foot {
+  z-index: 3;
+}
+
+@media (max-width: 1000px) and (min-width: 761px) {
+  .crm-flow-art {
+    right: 8px;
+    bottom: 50px;
+    transform: scale(0.8);
+    transform-origin: bottom right;
+  }
+}
+
+@media (max-height: 620px) and (min-width: 761px) {
+  .crm-flow-art {
+    bottom: 35px;
+    transform: scale(0.72);
+    transform-origin: bottom right;
+  }
+}
+
 /* Entrada do CRM: formulário em cartão, respiro equilibrado e sem corte em telas baixas. */
 .login-page {
   min-height: 100vh;
