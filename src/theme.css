@@ -641,3 +641,175 @@ a {
   background: radial-gradient(ellipse at 68% 23%, rgba(93, 177, 226, 0.42), transparent 44%),
     radial-gradient(ellipse at 7% 84%, rgba(53, 166, 164, 0.28), transparent 40%);
 }
+
+/* Entrada do CRM: formulário em cartão, respiro equilibrado e sem corte em telas baixas. */
+.login-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #f1f7fc;
+}
+
+.login-decoration {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: linear-gradient(145deg, #19334d 0%, #235273 58%, #286b83 100%);
+}
+
+.login-decoration::before {
+  background: radial-gradient(ellipse at 76% 21%, rgba(112, 204, 244, 0.38), transparent 43%),
+    radial-gradient(ellipse at 8% 87%, rgba(61, 190, 185, 0.26), transparent 41%);
+}
+
+.login-quote {
+  width: min(100%, 440px);
+  margin-left: 0;
+}
+
+.login-quote > span {
+  color: #a7e4f8;
+}
+
+.login-quote h2 {
+  max-width: 430px;
+  font-size: clamp(32px, 3.4vw, 43px);
+  letter-spacing: -1.5px;
+}
+
+.login-quote p {
+  color: #d3e6f1;
+  font-size: 13px;
+}
+
+.login-panel {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 100% 0%, #e1f1fb 0%, transparent 42%), #f7fbfe;
+}
+
+.login-form-wrap {
+  position: relative;
+  width: min(420px, 100%);
+  padding: clamp(22px, 3.2vw, 34px);
+  border: 1px solid rgba(222, 235, 245, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 70px rgba(31, 70, 105, 0.1), 0 3px 12px rgba(31, 70, 105, 0.035);
+}
+
+.login-brand {
+  margin: 0 0 32px;
+}
+
+.login-brand .brand-dot {
+  color: #4a9dce;
+}
+
+.login-heading {
+  margin-bottom: 20px;
+}
+
+.login-heading h1 {
+  margin-top: 7px;
+  font-size: clamp(25px, 2.4vw, 30px);
+  letter-spacing: -1px;
+}
+
+.login-heading p {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.login-form-wrap .form-stack {
+  gap: 13px;
+}
+
+.login-form-wrap .form-stack > label {
+  gap: 6px;
+  color: #4f6273;
+  font-size: 10px;
+}
+
+.login-form-wrap .form-stack > label input {
+  height: 43px;
+  border-color: #dce7ef;
+  border-radius: 9px;
+  background: #fcfdff;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.login-form-wrap .form-stack > label input:focus {
+  border-color: #65add4;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(77, 157, 202, 0.13);
+}
+
+.login-form-wrap .button.full {
+  min-height: 44px;
+  margin-top: 3px;
+}
+
+.login-secure {
+  margin-top: 15px;
+  color: #718394;
+  font-size: 9px;
+}
+
+.login-secure::first-letter {
+  color: #438fc3;
+}
+
+@media (max-width: 760px) {
+  .login-page {
+    min-height: 100vh;
+    min-height: 100svh;
+    background: radial-gradient(ellipse at 50% 0%, #e4f3fc 0%, #f6fafe 46%, #edf5fb 100%);
+  }
+
+  .login-panel {
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 22px;
+    background: transparent;
+  }
+
+  .login-form-wrap {
+    width: min(420px, 100%);
+    padding: 27px 24px;
+  }
+
+  .login-brand {
+    margin-bottom: 36px;
+  }
+}
+
+@media (max-height: 620px) and (min-width: 761px) {
+  .login-panel {
+    padding: 16px 28px;
+  }
+
+  .login-form-wrap {
+    padding: 20px 26px;
+  }
+
+  .login-brand {
+    margin-bottom: 20px;
+  }
+
+  .login-heading {
+    margin-bottom: 13px;
+  }
+
+  .login-form-wrap .form-stack {
+    gap: 9px;
+  }
+
+  .login-form-wrap .form-stack > label input {
+    height: 39px;
+  }
+
+  .login-secure {
+    margin-top: 10px;
+  }
+}
