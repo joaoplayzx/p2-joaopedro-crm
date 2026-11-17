@@ -433,6 +433,7 @@ a {
   *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
@@ -640,6 +641,111 @@ a {
 .login-decoration::before {
   background: radial-gradient(ellipse at 68% 23%, rgba(93, 177, 226, 0.42), transparent 44%),
     radial-gradient(ellipse at 7% 84%, rgba(53, 166, 164, 0.28), transparent 40%);
+}
+
+/* Movimento delicado para dar vida ao produto sem transformar a interface em um GIF pesado. */
+@keyframes pageEntrance {
+  from { opacity: 0; transform: translateY(11px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -13px, 0); }
+}
+
+@keyframes glowDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-18px, 12px, 0) scale(1.04); }
+}
+
+@keyframes statusPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(226, 166, 78, 0); }
+  50% { box-shadow: 0 0 0 5px rgba(226, 166, 78, 0.13); }
+}
+
+@keyframes softShine {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+.page-content {
+  animation: pageEntrance 480ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.page-header {
+  animation: pageEntrance 540ms 35ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.metric-card {
+  animation: cardEntrance 600ms cubic-bezier(0.18, 0.75, 0.25, 1) both;
+}
+
+.metric-card:nth-child(2) { animation-delay: 90ms; }
+.metric-card:nth-child(3) { animation-delay: 160ms; }
+
+.dashboard-grid > .panel {
+  animation: pageEntrance 620ms 130ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.dashboard-grid > .panel:nth-child(2) { animation-delay: 210ms; }
+
+.welcome-strip {
+  animation: pageEntrance 650ms 220ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.main-area::before {
+  animation: glowDrift 18s ease-in-out infinite;
+}
+
+.login-orb {
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.login-quote {
+  animation: pageEntrance 850ms 100ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.login-form-wrap {
+  animation: cardEntrance 720ms 80ms cubic-bezier(0.18, 0.75, 0.25, 1) both;
+}
+
+.login-form-wrap .button.primary {
+  background-size: 180% 180%;
+  animation: softShine 5s ease-in-out infinite alternate;
+}
+
+.status-dot.aberto {
+  animation: statusPulse 2.6s ease-in-out infinite;
+}
+
+tbody tr {
+  animation: pageEntrance 380ms ease-out both;
+}
+
+tbody tr:nth-child(2) { animation-delay: 35ms; }
+tbody tr:nth-child(3) { animation-delay: 70ms; }
+tbody tr:nth-child(4) { animation-delay: 105ms; }
+tbody tr:nth-child(5) { animation-delay: 140ms; }
+
+.order-card,
+.timeline-entry {
+  animation: pageEntrance 420ms ease-out both;
+}
+
+.button:not(:disabled):active {
+  transform: translateY(1px) scale(0.985);
+}
+
+@media (max-width: 760px) {
+  .login-form-wrap .button.primary {
+    animation-duration: 7s;
+  }
 }
 
 /* Entrada do CRM: formulário em cartão, respiro equilibrado e sem corte em telas baixas. */
